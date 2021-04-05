@@ -14,7 +14,8 @@ from decimal import Decimal
 #     r = str(input())
 #     matrix.append(r.split(" "))
 
-matrix = [[4, 2, 3], [2, 1, 5], [3, 5, 6]]
+steps_list = []  # this will hold all of the operations performed on the matrix
+matrix = [[-4, 2, -3], [2, 1, 5], [3, 5, 6]]
 
 
 def solve():
@@ -22,6 +23,8 @@ def solve():
 
 # need func to check if matrix is rref or not
 # also should check for no soution 0 0 0 | X
+
+# convert to row echelon form
 
 
 def do_ref():
@@ -37,9 +40,14 @@ def do_ref():
                     matrix[i][j] = float(matrix[i][j]) / leading
 
                 # step 2 eliminate all non zero entries below
+                if i < len(matrix):
+                    for x in range(len(matrix) - i):
+                        next_index = i + x
+                        # check if target row is negative or positive so we know whether to add or subtract
+                        
 
 
-# do rref
+# do rref reduced row echelon form
 # assumes input is already in ref form
 
 
