@@ -14,45 +14,79 @@ from decimal import Decimal
 #     r = str(input())
 #     matrix.append(r.split(" "))
 
-steps_list = []  # this will hold all of the operations performed on the matrix
-matrix = [[-4, 2, -3], [2, 1, 5], [3, 5, 6]]
+steps_list = []
+# matrix = [[0, 2, -3], [2, 0, 5], [1, 4, 6], [0, 1, 3]]
+matrix = [[0, 2, -3], [5, 0, 5], [1, 2, 3]]
+
+num_cols = len(matrix[0])
+num_rows = len(matrix)
+print(f'matrix has {num_rows} rows and {num_cols} cols')
 
 
 def solve():
     do_ref()
 
-# need func to check if matrix is rref or not
-# also should check for no soution 0 0 0 | X
-
-# convert to row echelon form
-
 
 def do_ref():
-    for i in range(len(matrix)):
-        row = matrix[i]
-        # print(lnz(matrix[i]))
-        leading = lnz(row)
-        if leading != 0 or leading is not None:
-            # step 1 scale to 1
-            # if not 1 divide whole row by leading
+    print()
+
+    for r in range(num_rows):  # iterate over the cols - 1
+        # sort the row by putting a non zero entry in the correct position
+        if (r < num_rows-1):
+            sort_rows(r)
+
+        # check [c][c] needs to be scaled to 1
+        leading = matrix[r][r]
+        if leading != 0:
             if leading != 1:
-                for j in range(len(row)):
-                    matrix[i][j] = float(matrix[i][j]) / leading
+                # divide entire row by leading
+                for c in range(num_cols):
+                    matrix[r][c] = float(matrix[r][c]) / leading
 
-                # step 2 eliminate all non zero entries below
-                if i < len(matrix):
-                    for x in range(len(matrix) - i):
-                        next_index = i + x
-                        # check if target row is negative or positive so we know whether to add or subtract
-                        
+            make_zeroes_below(r, r)
+
+        # for r in range(num_rows):
+        #     found_leading = False
+        #     # print(matrix[r][c])
+        #     x = matrix[r][c]  # this is the ideal leading position
+        #     if x != 0 and not found_leading:
+        #         # create a 1 in this spot
+        #         if x != 1:
+        #             for j in range(num_cols-c):
+        #                 matrix[r][j+c] = float(matrix[r][j+c]) / x
+        #         found_leading = True
 
 
-# do rref reduced row echelon form
-# assumes input is already in ref form
+# this method attempts to place a nonzero leading number
+# at the top most position in the matrix
 
 
-# method to check an array and return the leading non zero number
-# (the last number is the right hand side so we ignore)
+def sort_rows(c):
+    target = matrix[c][c]  # this should be a non zero number after sorting
+    if target == 0:
+        # need to look below
+        found = False
+        for i in range(num_rows-c-1):
+            if not found:
+                val = matrix[c+i+1][c]
+                if val != 0:
+                    found = True
+                    swap_rows(c, c+i+1)
+
+
+def swap_rows(index_1, index_2):
+    temp = matrix[index_1]
+    matrix[index_1] = matrix[index_2]
+    matrix[index_2] = temp
+
+
+def make_zeroes_below(r, c):
+    # we know matrix[r][c] is a one
+    for i in range(num_rows-r-1):
+        print(matrix[i])
+        scale_amount = matrix[i+r][c]
+        for j in range(len(matrix[i+r])):
+            print('set me to zero and subtract from right values by the scaled amount')
 
 
 def lnz(row):
@@ -61,12 +95,6 @@ def lnz(row):
         if current != 0:
             return current
 
-# rref = check_rref(matrix)
-# rref steps
-
-
-# def dec_to_fraction(dec):
-#     n, d = Decimal(str(dec)).as_integer_ratio()
 
 # use numpy for ez formatting (need to make sure to use fractions over decimals)
 solve()
