@@ -2,6 +2,7 @@
 import numpy as np
 from fractions import Fraction
 from decimal import Decimal
+import copy
 
 # input
 # print('enter number number of rows:')
@@ -16,7 +17,7 @@ from decimal import Decimal
 
 steps_list = []
 # matrix = [[0, 2, -3], [2, 0, 5], [1, 4, 6], [0, 1, 3]]
-matrix = [[0, 2, -3], [5, 0, 5], [1, 2, 3]]
+matrix = [[1, 2, -3], [3, 0, 5], [4, 2, 3]]
 
 num_cols = len(matrix[0])
 num_rows = len(matrix)
@@ -28,7 +29,7 @@ def solve():
 
 
 def do_ref():
-    print()
+    print_matrix()
 
     for r in range(num_rows):  # iterate over the cols - 1
         # sort the row by putting a non zero entry in the correct position
@@ -37,25 +38,21 @@ def do_ref():
 
         # check [c][c] needs to be scaled to 1
         leading = matrix[r][r]
+        print(f'leading {leading}')
         if leading != 0:
             if leading != 1:
                 # divide entire row by leading
                 for c in range(num_cols):
                     matrix[r][c] = float(matrix[r][c]) / leading
-
+            print_matrix()
             make_zeroes_below(r, r)
 
-        # for r in range(num_rows):
-        #     found_leading = False
-        #     # print(matrix[r][c])
-        #     x = matrix[r][c]  # this is the ideal leading position
-        #     if x != 0 and not found_leading:
-        #         # create a 1 in this spot
-        #         if x != 1:
-        #             for j in range(num_cols-c):
-        #                 matrix[r][j+c] = float(matrix[r][j+c]) / x
-        #         found_leading = True
-
+    # at this point we are in ref
+    # we can check for no solutions now if leading variable is in the very last column
+    if has_solution():
+        print('has solution!')
+    else:
+        print('this matrix has no solution!')
 
 # this method attempts to place a nonzero leading number
 # at the top most position in the matrix
@@ -83,25 +80,45 @@ def swap_rows(index_1, index_2):
 def make_zeroes_below(r, c):
     # we know matrix[r][c] is a one
     for i in range(num_rows-r-1):
-        print(matrix[i])
-        scale_amount = matrix[i+r][c]
-        for j in range(len(matrix[i+r])):
-            print('set me to zero and subtract from right values by the scaled amount')
+        current_row = i + r + 1
+        print(f'current row {current_row}')
+        scale_amount = float(matrix[current_row][c])
+        print(f'scale amount: {scale_amount}')
+        for j in range(num_cols):
+            if scale_amount != 0:  # subtract
+                # subtract each value in current row by the scalar amount of the above value
+                matrix[current_row][j] = matrix[current_row][j] - \
+                    matrix[r][j] * scale_amount
+        print_matrix()
 
 
+# makes sure all leading values are on the left hand side of the matrix
+def has_solution():
+    valid = True
+    for r in range(num_rows):
+        print(lnz(r))
+        if lnz(r) >= num_cols:
+            valid = False
+    return valid
+
+
+# returns index of lnz
 def lnz(row):
-    for i in range(len(row)-1):
-        current = row[i]
+    for i in range(num_cols):
+        current = matrix[row][i]
         if current != 0:
-            return current
+            return i + 1
 
 
-# use numpy for ez formatting (need to make sure to use fractions over decimals)
+def print_matrix():
+    print()
+    temp = copy.deepcopy(matrix)
+    for i in range(len(temp)):
+        for j in range(len(temp[i])):
+            temp[i][j] = str(
+                Fraction(temp[i][j]).limit_denominator(max_denominator=1000))
+    print(np.matrix(temp))
+
+
 solve()
-# convert dec to fractions
-
-for i in range(len(matrix)):
-    for j in range(len(matrix[i])):
-        matrix[i][j] = str(
-            Fraction(matrix[i][j]).limit_denominator(max_denominator=1000))
-print(np.matrix(matrix))
+print_matrix()
